@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,33 +141,9 @@
                         "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."],
                 dayNames: ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"],
                 dayNamesShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."],
-                dayNamesMin: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."],
-                onSelect: function() {
-                    calculateDays();
-                }
+                dayNamesMin: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."]
             });
-            $("#device, #problem").on("change", calculateDays);
         });
-
-        function calculateDays() {
-            let startDateStr = $("#device").val();
-            let endDateStr = $("#problem").val();
-            if (startDateStr && endDateStr) {
-                try {
-                    var startDate = $.datepicker.parseDate('mm/dd/yy', startDateStr);
-                    var endDate = $.datepicker.parseDate('mm/dd/yy', endDateStr);
-                    var diffTime = endDate - startDate;
-                    var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    if(diffDays < 0){
-                        $("#place").val('');
-                        return;
-                    }
-                    $("#place").val(diffDays + " วัน");
-                } catch (err) {
-                    $("#place").val('');
-                }
-            }
-        }
     </script>
 </head>
 <body>
@@ -190,7 +165,8 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <label for="leaveDate"><i class="bi bi-calendar-event"></i> วันที่</label>
-                    <input type="text" id="leaveDate" name="leaveDate" class="form-control" readonly required>
+                    <!-- เพิ่มคลาส datepicker ตรงนี้เพื่อให้กดเลือกวันที่ได้ -->
+                    <input type="text" id="leaveDate" name="leaveDate" class="form-control datepicker" readonly required>
                     <div class="invalid-feedback">กรุณากรอกวันที่</div>
                 </div>
             </div>
@@ -268,7 +244,6 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
     <script>
-        // เปลี่ยน scriptUrl, LIFF ID, dashboard url ตามที่คุณแจ้ง
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbwyxQkfRlM-QwScdAQ9OUjtMI8cJQ6Z2j2BnxDY77fqb87EW4ZW-5LaTKr9GFG8FfPCWA/exec';
         const liffId = '2007478637-jpavZ7pV';
         const dashboardUrl = 'https://aomaree12.github.io/rodb.github.io/';
@@ -426,7 +401,8 @@
                 });
             }
         }
-        // ฟังก์ชันสร้าง Flex Message
+
+        // ฟังก์ชันสร้าง Flex Message (อัปเดตเพิ่ม Link พร้อมระยะห่าง)
         function sendROFlex(profile, data) {
             let flex = {
                 type: 'flex',
@@ -485,8 +461,22 @@
                                                         weight: "bold",
                                                         action: {
                                                             type: "uri",
-                                                            label: "รายงานระบบน้ำ RO 💧🧪",
+                                                            label: "รายงานระบบน้ำ RO",
                                                             uri: dashboardUrl
+                                                        }
+                                                    },
+                                                    // ---- เพิ่มลิงก์: ผลเพาะเชื้อระบบน้ำ RO (มี margin ด้านบนเพื่อความห่าง) ----
+                                                    {
+                                                        type: "text",
+                                                        text: "🦠 ผลเพาะเชื้อระบบน้ำ RO",
+                                                        size: "sm",
+                                                        color: "#25675a",
+                                                        weight: "bold",
+                                                        margin: "md",
+                                                        action: {
+                                                            type: "uri",
+                                                            label: "ผลเพาะเชื้อระบบน้ำ RO",
+                                                            uri: "https://script.google.com/macros/s/AKfycbz2E-kTI-sQw8nH3pMBdZOmA83sioeBlzioL9mdGUy7tDGIGIOrfpHxMykDFd9uKZbSLg/exec"
                                                         }
                                                     }
                                                 ]
@@ -551,7 +541,7 @@
                                             },
                                             {
                                                 type: "text",
-                                                text: "📉RO Conductivity : " + data.ro_conductivity,
+                                                text: "📉 RO Conductivity : " + data.ro_conductivity,
                                                 size: "sm"
                                             },
                                             {
@@ -576,17 +566,31 @@
                     footer: {
                         "type": "box",
                         "layout": "vertical",
+                        "spacing": "lg", // เพิ่มระยะห่างระหว่างรายการใน Footer
                         "contents": [
                             {
                                 "type": "text",
                                 "text": "ตรวจสอบระบบน้ำ RO",
-                                "position": "relative",
                                 "weight": "bold",
                                 "align": "center",
+                                "color": "#25675a",
                                 "action": {
                                     "type": "uri",
-                                    "label": "action",
+                                    "label": "ตรวจสอบระบบน้ำ RO",
                                     "uri": liffAppUrl
+                                }
+                            },
+                            // ---- เพิ่มลิงก์: ตารางเวร On call ----
+                            {
+                                "type": "text",
+                                "text": "📅 ตารางเวร On call",
+                                "weight": "bold",
+                                "align": "center",
+                                "color": "#39b7b1",
+                                "action": {
+                                    "type": "uri",
+                                    "label": "ตารางเวร On call",
+                                    "uri": "https://aomaree12.github.io/nurse.calendar"
                                 }
                             }
                         ]
